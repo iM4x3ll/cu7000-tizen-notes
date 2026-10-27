@@ -1,0 +1,17 @@
+.DS_Store
+Thumbs.db
+*.wgt
+*.p12
+*.pem
+*.key
+*.crt
+certs/
+backups/
+*.local.js
+.env
+.env.*
+.sdb/
+tools/sdb/
+node_modules/
+__pycache__/
+*.pyc
