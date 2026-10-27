@@ -6,6 +6,8 @@ This is a field notes repo, not a product. It records what worked on one Crystal
 
 **Tested on one TV.** Treat every other model, year, and firmware as unproven.
 
+Mirrors: [GitHub](https://github.com/iM4x3ll/cu7000-tizen-notes) · [GitLab](https://gitlab.com/Maxwell333/cu7000-tizen-notes)
+
 ## What we kept
 
 - AirPlay 2
