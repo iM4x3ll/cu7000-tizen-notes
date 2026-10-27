@@ -1,10 +1,12 @@
 .DS_Store
 Thumbs.db
+*.swp
 *.wgt
 *.p12
 *.pem
 *.key
 *.crt
+*.cer
 certs/
 backups/
 *.local.js
@@ -15,3 +17,5 @@ tools/sdb/
 node_modules/
 __pycache__/
 *.pyc
+.idea/
+.vscode/
