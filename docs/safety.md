@@ -1,32 +1,28 @@
 # Safety and restore
 
-This setup stays inside Samsung **Developer Mode** and signed sideloads. That is already enough rope.
+Stay inside Samsung **Developer Mode** and signed sideloads.
 
 ## Do not
 
 - Enable SSH or open port 22 on the TV.
-- Use archive-root, Vetro, or CVE writeups (including SVE-2025-50109) to remap Home.
-- Weaken someone else's native Home helper “just to see.”
-- Commit certificates, DUID files, signed `.wgt` packages, applist dumps, or LAN IPs.
-- Uninstall AirPlay, the iPhone Remote stack, TV Plus, or Samsung Home to save RAM.
+- Use root, archive-root, or Home-button exploits.
+- Weaken someone else's native Home helper to run it here.
+- Commit certificates, DUID files, signed `.wgt` packages, applists, or LAN IPs.
+- Uninstall AirPlay, iPhone Remote, TV Plus, or Samsung Home to save RAM.
 
 ## Restore
 
-Keep a script that uninstalls **only** packages you sideloaded, for example:
+Uninstall **only** packages you sideloaded, then confirm they are gone from
+`applist`. If you turned **Start with Smart Hub Home** off, turn it back on
+for stock boot. AirPlay, TV Plus, and official Plex should still be there.
 
-```
-vd_appuninstall VemmPrevw0
-vd_appuninstall DclHome001
-```
-
-Then:
-
-1. Confirm `applist` no longer shows those ids.
-2. If you turned **Start with Smart Hub Home** off, turn it back on if you want stock boot.
-3. AirPlay / TV Plus / official Plex should still be there.
-
-If the launcher or Vemm will not open after an update, the usual cause is an **author certificate mismatch**, not a corrupt TV. Install the same cert you signed the previous build with. Do not uninstall first unless you are willing to lose that app's local settings.
+If a sideloaded app will not open after an update, the usual cause is an
+**author certificate mismatch**. Sign with the same certificate as the
+previous build. Do not uninstall first unless you are willing to lose that
+app's local settings.
 
 ## Background processes
 
-Stopping random Samsung services from a launcher is how you lose AirPlay. If you stop preview / Continue Watching hogs when the custom home is in front, name them, back them up, and never include AirPlay, Vemm, or the launcher itself.
+Stopping random Samsung services from a launcher is how AirPlay disappears.
+If you stop preview services when the custom home is in front, name them and
+never include AirPlay, Vemm, or the launcher.
