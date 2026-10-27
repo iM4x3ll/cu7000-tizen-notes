@@ -1,123 +1,128 @@
-# Samsung CU7000 / Tizen 9 living-room notes
+# CU7000 / Tizen 9 living-room notes
 
-A working living-room setup on a **Samsung UN65CU7000FXZA** (Tizen 9, armv7): a quiet custom home screen, a local Plex client that actually Direct Plays, and the TV features that are worth keeping.
+Working notes from one Samsung **UN65CU7000FXZA** (Tizen 9, armv7): a quiet
+sideloaded home screen, a Plex client that Direct Plays, and the stock
+features that are worth keeping.
 
-This is a field notes repo, not a product. It records what worked on one Crystal UHD, 2023-class set after a lot of wrong turns. It is not a root kit, not a Home-button exploit, and not a dump of someone else's client.
+This is not a product, a root kit, or a fork of anyone else's client.
+**Tested on one TV.** Treat every other model and firmware as unproven.
 
-**Tested on one TV.** Treat every other model, year, and firmware as unproven.
+- GitHub: https://github.com/iM4x3ll/cu7000-tizen-notes
+- GitLab: https://gitlab.com/Maxwell333/cu7000-tizen-notes
+- Vemm report: https://github.com/dragoshont/vemm/issues/8
 
-Mirrors: [GitHub](https://github.com/iM4x3ll/cu7000-tizen-notes) · [GitLab](https://gitlab.com/Maxwell333/cu7000-tizen-notes)
-
-## What we kept
+## Kept
 
 - AirPlay 2
 - iPhone Remote
 - Samsung TV Plus
 - YouTube
-- Official Plex (left installed; the living-room player is Vemm)
+- Official Plex (installed, not on the dock)
 
-## What we used
+## Used
 
-| Piece | Upstream | Role on this TV |
-| --- | --- | --- |
-| Arn0 Launcher (`Arn0Lnchr0.Launcher`) | Quiet Tizen home screen (local `arn0-tv` tree; related idea: [CleanFrame](https://github.com/nthnclrk/CleanFrame)) | Apple TV–style dock: Vemm, TV Plus, YouTube, AirPlay, Netflix, Disney+, Prime, Spotify, Stremio, Live TV, HDMI 1–3 |
-| [Vemm Preview](https://github.com/dragoshont/vemm) (`VemmPrevw0.VemmPreview`) | GPL-3 Plex-compatible Tizen client | AVPlay + Plex Direct Play |
-| Official Developer Mode | Samsung | Sideload signed `.wgt` only |
+| Piece | Role |
+| --- | --- |
+| [Vemm](https://github.com/dragoshont/vemm) Preview (`VemmPrevw0.VemmPreview`) | Plex-compatible AVPlay client (GPL-3) |
+| Arn0 Launcher (`Arn0Lnchr0.Launcher`) plus Home watcher | Sideloaded dock; Home returns here |
+| Official Developer Mode | Signed `.wgt` sideload only |
 
-Home watcher (`Arn0Lnchr0.Watcher`) plus **Autorun Last App** is the Route B remap. **Autorun Last App ignores sideloaded packages on this firmware**, so the watcher still matters. Samsung's own Home stays installed.
+Samsung Home stays installed. **Autorun Last App** does not treat a sideloaded
+app as the last app on this firmware, so the watcher still matters.
 
-## What we refused
+## Refused
 
 - SSH / port 22
-- Root or archive-root
-- Home remaps that use SVE-2025-50109 or similar
-- `sdb shell 0 debug` (it hung the Developer Mode session on this set)
+- Root, archive-root, or Home-button exploits
+- `sdb shell 0 debug` (it hung Developer Mode on this set)
 
-If a guide tells you to root a 2023 Samsung to replace Home, it is the wrong guide for this TV.
+A guide that roots a 2023 Samsung to replace Home is the wrong guide for this TV.
 
-## Install path that actually works
+## Sideload
 
-Retail `sdb` on Tizen 9 only does a handful of things reliably: `applist`, `getduid`, `install` / `uninstall`. A plain `sdb install` often **only pushes** the file.
+Retail `sdb` on Tizen 9 is reliable for `applist`, `getduid`, and install /
+uninstall. A plain `sdb install` often **only copies** the file.
 
-What worked here:
-
-1. Put the TV in Developer Mode and bind the PC.
-2. Sign the unsigned app with the **same author certificate** you will keep using (`Apps2Samsung` / Tizen author cert for this DUID).
+1. Enable Developer Mode and bind the PC.
+2. Sign with the **same** author certificate on every update.
 3. `sdb push` the signed `.wgt` to `/home/owner/share/tmp/sdk_tools/`.
-4. Install with `sdb shell 0 vd_appinstall <appid> <remote-wgt-path>`.
+4. Install with `sdb shell 0 vd_appinstall <appid> <remote-path>`.
 5. Launch with `sdb shell 0 was_execute <appid>` or from the app list.
 
-Do not rotate the author certificate on an update. A mismatch can force an uninstall and wipe the app's local settings.
+Do not rotate the author certificate. A mismatch can force an uninstall and
+wipe that app's local settings. Store apps did not uninstall cleanly through
+`sdb` here; leave them, or remove them from the TV menus.
 
-Store apps (official Plex, TV Plus, YouTube) did **not** uninstall cleanly through `sdb` on this firmware. Leave them, or remove them from the TV's own menus.
+Details: [docs/install.md](docs/install.md).
 
-## Boot / Home reality
+## Boot
 
-- **Autorun Last App** does not treat a sideloaded launcher as a last app.
-- If the TV still wakes into Smart Hub, turn **Start with Smart Hub Home** off and **Autorun Samsung TV Plus** off on the TV itself.
-- The software Home watcher is the thing that brings Arn0 back after you press Home. It is not instant; a 1.5 s poll was enough here.
-- Keep a restore script that only uninstalls **your** packages (`VemmPrevw0`, `DclHome001`, …). Do not wipe Samsung Home, AirPlay, or TV Plus.
+- If the TV still wakes into Smart Hub, turn **Start with Smart Hub Home**
+  off and **Autorun Samsung TV Plus** off on the TV.
+- The Home watcher brings the launcher back after Home. About 1.5 s was enough.
+- Restore by uninstalling **only** packages you sideloaded. Do not remove
+  Samsung Home, AirPlay, or TV Plus.
 
-## Vemm on this CU7000
+Details: [docs/safety.md](docs/safety.md).
 
-Vemm is still the best AVPlay Plex client we compared for this set (official Plex, Flixor, and the usual sideload names included). The stock defaults are not CU7000-safe.
+## Vemm on this set
 
-### Settings that stayed stable
+Vemm was the best AVPlay Plex client compared here. Stock defaults are not
+CU7000-safe.
 
-- Quality **original** (not a 1080p cap)
-- Direct Play **auto**
-- Min buffer **1 s**
-- Skip intro **auto**
-- Skip credits **button**
+Stable settings:
+
+- Quality **original**, Direct Play **auto**, min buffer **1 s**
+- Skip intro **auto**, skip credits **button**
 - Next episode **after credits** (not countdown)
 - Continue Watching **play**
-- Artwork cache about **25 MB**, home preload on, enhanced graphics **off**
-- Never burn Plex subtitles into the transcode (`burn=0`). Default `subtitleId` 0. Mute native text unless the viewer picked a track.
+- Artwork about **25 MB**, home preload on, enhanced graphics **off**
+- Never burn Plex subtitles (`burn=0`). Default `subtitleId` 0 unless the
+  viewer picked a track in this client
 
-### Landmines
-
-| Symptom | Cause on this TV |
+| Symptom | Cause |
 | --- | --- |
-| Audio only, spinner stuck at 99% | Quality cap `1080h` forced HLS / transcode. AVPlay often never fires `onbufferingcomplete`. |
-| “Off” still shows captions | Following Plex's selected subtitle burned them into HLS. |
-| Play bar never hides while playing | Every clock tick reported buffering-false and reset the hide timer. |
-| Play bar hides only when paused | Hide timer required `state === "playing"` and those ticks kept cancelling it. |
-| Next episode starts, bar pops back and stays | Start-of-episode buffer/state ticks called `showHud` again and never armed the timer. |
-| Episode freezes on the last frame | `STREAM_COMPLETED` leaves native AVPlay **IDLE**. `close()` threw; the leave-guard never ran. |
-| Next episode cuts the last minute | Plex **credits** markers fire early. A 10 s “Up Next” countdown treated that as the end. |
-| App dies when you press Back | `avplay.stop()` / `close()` during `prepareAsync` native-crashes Tizen 9. |
-| Auto skip intro at 0:00 crashes playback | Seeking before the first frame. Gate intro skip on startup-done. |
+| Audio only, spinner at 99% | `1080h` forced HLS. AVPlay often never fires `onbufferingcomplete`. |
+| Off still shows captions | Following Plex's selected subtitle burned them into HLS. |
+| Play bar never hides | Clock ticks reported buffering-false and reset the hide timer. |
+| Bar hides only when paused | Hide timer requires `state === "playing"`. |
+| Next episode, bar stays up | Start-of-episode ticks called `showHud` and never armed the timer. |
+| Freeze on the last frame | `STREAM_COMPLETED` leaves AVPlay **IDLE**; `close()` threw. |
+| Last minute cut off | Plex credits markers fire early; a 10 s countdown treated that as the end. |
+| Back kills the app | `stop()` / `close()` during `prepareAsync` native-crashes Tizen 9. |
+| Intro skip at 0:00 crashes | Seek before the first frame. |
 
-BIF seek-thumbnails and a 0.5 s / 150 MB artwork budget were also tried. Both made this TV worse. Walked back.
+A 0.5 s buffer, a 150 MB artwork budget, and BIF seek-thumbs all made this TV
+worse.
 
-### Next-episode behaviour we ended on
+Play through the credits and the real ending, then start the next title. Keep
+**Skip Credits** for a manual jump.
 
-Play the episode through the credits and the real ending (`STREAM_COMPLETED`), then start the next title. Show **Skip Credits** if the viewer wants out. Do not auto-advance when the credits marker appears.
+Details: [docs/cu7000-playback.md](docs/cu7000-playback.md).
 
 ## Dock
 
-Order that felt right on this set: **Vemm, TV Plus, YouTube, AirPlay, Netflix, Disney+, Prime, Spotify, Stremio, Live TV**, then HDMI 1–3 always visible. Official Plex was dropped from the dock in favor of AirPlay. The official Plex app can stay installed.
+Vemm, TV Plus, YouTube, AirPlay, Netflix, Disney+, Prime, Spotify, Stremio,
+Live TV, then HDMI 1–3 always shown. Official Plex can stay installed off the
+dock.
 
-Weather, if you add it, should be **your** coordinates. Do not copy someone else's city.
+Do not stop Samsung's AirPlay process to save RAM. Preview / Continue Watching
+services behind the launcher were the hogs here.
 
-## RAM / background hogs
+## This repo is not
 
-With only Vemm in front, this TV still ran hot if preview / Continue Watching services stayed alive behind the launcher. Stopping known background hogs when Arn0 is home (and not touching AirPlay, Vemm, or Arn0 itself) helped. Do not stop Samsung's AirPlay process to “save RAM.”
-
-## What this repo is not
-
-- Not a fork of Vemm. Vemm is [GPL-3](https://github.com/dragoshont/vemm). If you publish a modified client, publish the source under GPL-3 and say it is a fork.
-- Not a signed `.wgt`. Sign on your own TV / DUID.
-- Not your certificate, DUID, applist, or LAN addresses. Those do not belong on GitHub or GitLab.
-
-The CU7000-specific playback notes are in [docs/cu7000-playback.md](docs/cu7000-playback.md). The sideload steps are in [docs/install.md](docs/install.md). Safety / restore is in [docs/safety.md](docs/safety.md).
+- A Vemm fork. Modified Vemm stays [GPL-3](https://github.com/dragoshont/vemm)
+  and should say it is a fork.
+- A signed `.wgt`. Sign on your own TV.
+- A place for certificates, DUIDs, applists, or LAN addresses.
 
 ## Credits
 
-- [Vemm](https://github.com/dragoshont/vemm) — Plex-compatible Tizen client
-- Arn0 — quiet Tizen home screen used as the dock
-- [AeroTizen](https://github.com/helalaou/AeroTizen) — signing / packaging helpers
-- [CleanFrame](https://github.com/nthnclrk/CleanFrame) — Home-button approach we did **not** copy onto this Tizen 9 set
+- [Vemm](https://github.com/dragoshont/vemm)
+- Arn0 (sideloaded dock)
+- [AeroTizen](https://github.com/helalaou/AeroTizen) (signing helpers)
+- [CleanFrame](https://github.com/nthnclrk/CleanFrame) (Home approach **not**
+  used on this Tizen 9 set)
 - Samsung AVPlay and official Developer Mode
 
-Use at your own risk. Crystal UHD / Tizen 9 is unforgiving, and a bad `close()` will take the whole app with it.
+Use at your own risk.
